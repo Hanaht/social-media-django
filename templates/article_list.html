@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load custom_filters %}
+{% block title %}Articles{% endblock title %}
+{% block content %}
+
+
+
+{% for article in object_list %}
+<div class="card">
+<div class="card-header">
+<span class="font-weight-bold"><a href="{% url 'article_detail' article.pk %}">{{ article.title }}</a></span> &middot;
+<span class="text-muted">by {{ article.author }} |
+{{ article.date }}</span>
+</div>
+<div class="card-body">
+{{ article.body }}
+
+</div>
+
+<div class="card-footer text-center text-muted">
+    <a href="{% url 'article_edit' article.pk %}">Edit</a> |
+    <a href="{% url 'article_delete' article.pk %}">Delete</a>
+    </div>
+    <div class="d-flex flex-row">
+        <form method="POST" action="{% url 'like' article.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+
+            {% if article.likes.all|select_item:user.username %}
+                <button style="color: white; font-size: 14px; background-color: rgb(78, 189, 248); border: none; padding: 6px 18px; border-radius: 25px; box-shadow: none;" type="submit"><i class="fa fa-thumbs-up"></i></button>
+            {% else %}
+                <button style="font-size: 14px; background-color: #dfdfdf; border: none; padding: 6px 18px; border-radius: 25px; box-shadow: none;" type="submit"><i class="fa fa-thumbs-up"></i></button>
+            {% endif %}
+            <span style="margin-right: 20px;">{{ article.likes.all.count }}</span> 
+
+        </form>
+
+        <form method="POST" action="{% url 'dislike' article.pk %}">
+            {% csrf_token %}
+            <input type="hidden" name="next" value="{{ request.path }}">
+            
+            {% if article.dislikes.all|select_item:user.username %}
+                <button style="color: white; font-size: 14px; background-color: rgb(214, 48, 70); border: none; padding: 6px 18px; border-radius: 25px; box-shadow: none;" type="submit"><i class="fa fa-thumbs-down"></i></button>
+            {% else %}
+                <button style="font-size: 14px; background-color: #dfdfdf; border: none; padding: 6px 18px; border-radius: 25px; box-shadow: none;" type="submit"><i class="fa fa-thumbs-down"></i></button>
+            {% endif %}
+            <span>{{ article.dislikes.all.count }}</span>
+
+        </form>
+    </div>
+</div>
+<br />
+
+
+{% endfor %}
+
+
+<form method="GET">
+    {{ filter.form }}
+    <button type="submit">Search</button>
+  </form>
+  <ul>
+
+  </ul>
+  
+
+{% endblock content %}
